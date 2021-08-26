@@ -18,6 +18,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
+
 
 
 
@@ -36,7 +39,7 @@ int main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "HexOpenGL test", NULL, NULL);
+    window = glfwCreateWindow(960, 540, "HexOpenGL test", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -56,10 +59,10 @@ int main(void)
     {
         //triangle position verticies
         float positions[] = {
-           -0.5f, -0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, 1.0f, 0.0f,
-            0.5f,  0.5f, 1.0f, 1.0f,
-           -0.5f,  0.5f, 0.0f, 1.0f,
+            -50.0f,-50.0f, 0.0f, 0.0f,
+             50.0f,-50.0f, 1.0f, 0.0f,
+             50.0f, 50.0f, 1.0f, 1.0f,
+            -50.0f, 50.0f, 0.0f, 1.0f,
         };
 
         unsigned int indices[] = {
@@ -69,7 +72,7 @@ int main(void)
 
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-        
+
         unsigned int vao;
         GLCall(glGenVertexArrays(1, &vao));
         GLCall(glBindVertexArray(vao));
@@ -80,17 +83,19 @@ int main(void)
         VertexBufferLayout layout;
         layout.Push<float>(2);
         layout.Push<float>(2);
-        va.AddBuffer(vb,layout);
-        
+        va.AddBuffer(vb, layout);
+
 
         IndexBuffer ib(indices, 6);
 
-        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+        glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+
 
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
         shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-        shader.SetUniformMat4f("u_MVP", proj);
+
 
         Texture texture("res/textures/wBWgt51.png");
         texture.Bind();
@@ -102,13 +107,23 @@ int main(void)
         //   std::cout << source.VertexSource << std::endl;
         //   std::cout << "FRAGMENT" << std::endl;
         //   std::cout << source.FragmentSource << std::endl;
-      
+
         va.Unbind();
         vb.Unbind();
         ib.Unbind();
         shader.Unbind();
 
+
         Renderer renderer;
+
+        ImGui::CreateContext();
+        ImGui_ImplGlfwGL3_Init(window, true);
+        ImGui::StyleColorsDark();
+
+
+        glm::vec3 translationA(200, 200, 0);
+        glm::vec3 translationB(400, 200, 0);
+
         float r = 0.0f;
         float increment = 0.05f;
         /* Loop until the user closes the window */
@@ -117,12 +132,48 @@ int main(void)
             /* Render here */
             renderer.Clear();
 
-            
+            ImGui_ImplGlfwGL3_NewFrame();
 
-            renderer.Draw(va, ib, shader);
-            
 
-            
+            shader.Bind();
+
+
+            {
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+                glm::mat4 mvp = proj * view * model;
+                shader.SetUniformMat4f("u_MVP", mvp);
+                shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+                renderer.Draw(va, ib, shader);
+            }
+
+
+
+
+            {
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
+                glm::mat4 mvp = proj * view * model;
+                shader.SetUniformMat4f("u_MVP", mvp);
+                shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+                renderer.Draw(va, ib, shader);
+            }
+
+
+
+            if (r > 1.0f)
+                increment = -0.5f;
+            else if (r < 0.0f)
+                increment = 0.05f;
+
+            r += increment;
+
+            {                                        
+                ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 960.0f);
+                ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 960.0f);
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            }
+
+            ImGui::Render();
+            ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
             /* Swap front and back buffers */
             GLCall(glfwSwapBuffers(window));
@@ -133,6 +184,8 @@ int main(void)
 
     
     }
+    ImGui_ImplGlfwGL3_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
     return 0;
 }
