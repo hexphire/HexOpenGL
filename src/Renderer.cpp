@@ -30,3 +30,8 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     ib.Bind();
     GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 }
+
+void Renderer::DrawArray(const GLenum mode, GLint first, GLsizei count) const
+{
+    GLCall(glDrawArrays(mode, first, count));
+}
