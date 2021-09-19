@@ -14,7 +14,7 @@ namespace test {
     TestCube::TestCube()
         : m_Proj(glm::perspective(45.0f, 1.0f * 800 / 600, 0.1f, 10.0f)),
         m_View(glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0))),
-        m_TranslationA(200, 200, 0), m_TranslationB(400, 200, 0)
+        m_TranslationA(200, 200, 0), m_TranslationB(400, 200, 0), m_xRot(false), m_yRot(true), m_zRot(false)
         
 	{
 
@@ -67,9 +67,7 @@ namespace test {
                 6, 7, 3
         };
 
-        
-
-        
+     
         m_VAO = std::make_unique<VertexArray>();
         m_VertexBuffer = std::make_unique<VertexBuffer>(positions, sizeof(positions));
         m_ColorsBuffer = std::make_unique<VertexBuffer>(colorsBuffer, sizeof(colorsBuffer));
@@ -78,39 +76,18 @@ namespace test {
         layout.Push<float>(3);
         
         
-        
-
-
+ 
         m_VAO->AddBuffer(*m_VertexBuffer, layout);
         m_VAO->AddBuffer(*m_ColorsBuffer, layout);
         m_IndexBuffer = std::make_unique<IndexBuffer>(indices, sizeof(indices));
 
+
         m_Shader = std::make_unique<Shader>("res/shaders/Cube.shader");
         m_Shader->Bind();
-
-        m_program = m_Shader->getProgram();
+        m_attribute_coord3d = m_Shader->GetAttribLoc("coord3d");
+        m_attribute_v_color = m_Shader->GetAttribLoc("v_color");
         
-
-
-        const char* attribute_name;
-        attribute_name = "coord3d";
-        m_attribute_coord3d = glGetAttribLocation(m_program, attribute_name);
-        if (m_attribute_coord3d == -1) {
-            fprintf(stderr, "Could not bind attribute %s\n", attribute_name);
-        }
-
-        attribute_name = "v_color";
-        m_attribute_v_color = glGetAttribLocation(m_program, attribute_name);
-        if (m_attribute_coord3d == -1) {
-            fprintf(stderr, "Could not bind attribute %s\n", attribute_name);
-        }
         
-       
-        
-
-        
-
-
         //   print out shader info. 
 
         //   std::cout << "\nVERTEX" << std::endl;
@@ -128,14 +105,10 @@ namespace test {
 	{
         m_angle += .5;
         if (m_angle >= 360) m_angle = 0;
-  
-        glm::vec3 axis_y(0, 1, 0);
-        
 
+        glm::vec3 axis_y(m_xRot, m_yRot, m_zRot);
         glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
         model = glm::rotate(model, glm::radians(m_angle), axis_y);
-        m_View = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
-        m_Proj = glm::perspective(45.0f, 1.0f * 800 / 600, 0.1f, 10.0f);
 
         glm::mat4 mvp = m_Proj * m_View * model;
         m_Shader->Bind();
@@ -152,7 +125,7 @@ namespace test {
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
         Renderer renderer;
-
+        
         
         glEnableVertexAttribArray(m_attribute_coord3d);
         // Describe our vertices array to OpenGL (it can't guess its format automatically)
@@ -192,6 +165,9 @@ namespace test {
 
 	void TestCube::OnImGuiRender()
 	{
+        ImGui::Checkbox("x-axis rotation", &m_xRot);
+        ImGui::Checkbox("y-axis rotation", &m_yRot);
+        ImGui::Checkbox("z-axis rotation", &m_zRot);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 }

@@ -88,7 +88,7 @@ int main(void)
         {
             GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
             renderer.Clear();
-            GLfloat currentFrame = glfwGetTime();
+            GLfloat currentFrame = (float)glfwGetTime() * 1000;
             deltaTime = (currentFrame - lastFrame);
             lastFrame = currentFrame;   
 
