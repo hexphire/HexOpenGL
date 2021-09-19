@@ -91,7 +91,6 @@ int main(void)
             GLfloat currentFrame = glfwGetTime();
             deltaTime = (currentFrame - lastFrame);
             lastFrame = currentFrame;   
-            std::cout << currentFrame << std::endl;
 
             ImGui_ImplGlfwGL3_NewFrame();
             if (currentTest)
