@@ -27,6 +27,8 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
+	unsigned int getProgram() const;
+
 	//set uniforms
 	void SetUniform1i(const std::string& name, int value);
 	void SetUniform1f(const std::string& name, float value);
@@ -37,4 +39,5 @@ private:
 	unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
 	ShaderSource ParseShader(const std::string& filepath);
 	int GetUniformLocation(const std::string& name);
+
 };

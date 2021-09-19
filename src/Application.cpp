@@ -44,7 +44,7 @@ int main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(960, 540, "HexOpenGL test", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "HexOpenGL test", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
