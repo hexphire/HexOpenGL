@@ -8,6 +8,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace test {
     TestCube::TestCube()
@@ -73,7 +74,8 @@ namespace test {
         m_VertexBuffer = std::make_unique<VertexBuffer>(positions, sizeof(positions));
         m_ColorsBuffer = std::make_unique<VertexBuffer>(colorsBuffer, sizeof(colorsBuffer));
         VertexBufferLayout layout;
-        layout.Push<float>(2);
+        layout.Push<float>(3);
+        layout.Push<float>(3);
         
         
         
@@ -87,12 +89,7 @@ namespace test {
         m_Shader->Bind();
 
         m_program = m_Shader->getProgram();
-        GLint link_ok = GL_FALSE;
-        glLinkProgram(m_program);
-        glGetProgramiv(m_program, GL_LINK_STATUS, &link_ok);
-        if (!link_ok) {
-            fprintf(stderr, "glLinkProgram:");
-        }
+        
 
 
         const char* attribute_name;
@@ -107,14 +104,11 @@ namespace test {
         if (m_attribute_coord3d == -1) {
             fprintf(stderr, "Could not bind attribute %s\n", attribute_name);
         }
-        const char* uniform_name;
-        uniform_name = "u_MVP";
-        m_uniform_mvp = glGetUniformLocation(m_program, uniform_name);
-        if (m_uniform_mvp == -1) {
-            fprintf(stderr, "Could not bind uniform %s\n", uniform_name);   
-        }
+        
+       
+        
 
-
+        
 
 
         //   print out shader info. 
@@ -132,6 +126,21 @@ namespace test {
 
 	void TestCube::OnUpdate(float deltaTime)
 	{
+        m_angle += .5;
+        if (m_angle >= 360) m_angle = 0;
+  
+        glm::vec3 axis_y(0, 1, 0);
+        
+
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
+        model = glm::rotate(model, glm::radians(m_angle), axis_y);
+        m_View = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
+        m_Proj = glm::perspective(45.0f, 1.0f * 800 / 600, 0.1f, 10.0f);
+
+        glm::mat4 mvp = m_Proj * m_View * model;
+        m_Shader->Bind();
+        m_Shader->SetUniformMat4f("u_MVP", mvp);
+
 	}
 
 	void TestCube::OnRender()
@@ -144,7 +153,7 @@ namespace test {
 
         Renderer renderer;
 
-        glUseProgram(m_program);
+        
         glEnableVertexAttribArray(m_attribute_coord3d);
         // Describe our vertices array to OpenGL (it can't guess its format automatically)
         m_VertexBuffer->Bind();
@@ -173,10 +182,7 @@ namespace test {
 
 
         
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
-        glm::mat4 mvp = m_Proj * m_View * model;
-        m_Shader->Bind();
-        m_Shader->SetUniformMat4f("u_MVP", mvp);
+        
         renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
 
         glDisableVertexAttribArray(m_attribute_coord3d);
@@ -186,6 +192,6 @@ namespace test {
 
 	void TestCube::OnImGuiRender()
 	{
-       
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 }

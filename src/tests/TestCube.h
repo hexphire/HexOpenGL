@@ -32,6 +32,7 @@ namespace test {
 		GLuint m_program;
 		GLint m_attribute_coord3d, m_attribute_v_color;
 		GLint m_uniform_mvp;
+		float m_angle;
 		
 
 		glm::mat4 m_Proj, m_View;

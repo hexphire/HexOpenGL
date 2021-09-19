@@ -21,6 +21,5 @@ class Renderer
 public:
     void Clear() const;
     void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-    void DrawShort(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
     void DrawArray(const GLenum mode, GLint first, GLsizei count) const;
 };

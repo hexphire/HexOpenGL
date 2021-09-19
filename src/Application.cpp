@@ -17,6 +17,8 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
@@ -38,8 +40,8 @@ int main(void)
         return -1;
 
     
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
@@ -63,9 +65,8 @@ int main(void)
     std::cout << glGetString(GL_VERSION);
     {
 
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
+        
+        
         Renderer renderer;
 
         ImGui::CreateContext();
@@ -80,20 +81,24 @@ int main(void)
         testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
         testMenu->RegisterTest<test::TestCube>("Test Cube");
 
-        
+        GLfloat deltaTime = 0.0f;
+        GLfloat lastFrame = 0.0f;
 
         while (!glfwWindowShouldClose(window))
         {
             GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
             renderer.Clear();
-
-            
+            GLfloat currentFrame = glfwGetTime();
+            deltaTime = (currentFrame - lastFrame);
+            lastFrame = currentFrame;   
+            std::cout << currentFrame << std::endl;
 
             ImGui_ImplGlfwGL3_NewFrame();
             if (currentTest)
             {
-                currentTest->OnUpdate(0.0f);
+                currentTest->OnUpdate(deltaTime);
                 currentTest->OnRender();
+                
                 ImGui::Begin("Test");
                 if (currentTest != testMenu && ImGui::Button("<-")) 
                 {

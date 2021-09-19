@@ -31,14 +31,7 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 }
 
-void Renderer::DrawShort(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
-{
-    shader.Bind();
-    va.Bind();
-    ib.Bind();
-    int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    GLCall(glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, nullptr));
-}
+
 
 void Renderer::DrawArray(const GLenum mode, GLint first, GLsizei count) const
 {
