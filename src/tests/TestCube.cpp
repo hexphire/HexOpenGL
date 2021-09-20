@@ -14,7 +14,7 @@ namespace test {
     TestCube::TestCube()
         : m_Proj(glm::perspective(45.0f, 1.0f * 800 / 600, 0.1f, 10.0f)),
         m_View(glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0))),
-        m_TranslationA(200, 200, 0), m_TranslationB(400, 200, 0), m_xRot(false), m_yRot(true), m_zRot(false)
+        m_TranslationA(200, 200, 0), m_TranslationB(400, 200, 0), m_xRot(false), m_yRot(false), m_zRot(false)
         
 	{
 
@@ -103,12 +103,14 @@ namespace test {
 
 	void TestCube::OnUpdate(float deltaTime)
 	{
-        m_angle += .5;
+        m_angle += 0.5f;
         if (m_angle >= 360) m_angle = 0;
 
         glm::vec3 axis_y(m_xRot, m_yRot, m_zRot);
         glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
-        model = glm::rotate(model, glm::radians(m_angle), axis_y);
+
+        if(m_xRot || m_yRot || m_zRot)
+            model = glm::rotate(model, glm::radians(m_angle), axis_y);
 
         glm::mat4 mvp = m_Proj * m_View * model;
         m_Shader->Bind();
