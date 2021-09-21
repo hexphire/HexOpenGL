@@ -26,6 +26,7 @@
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture2D.h"
 #include "tests/TestCube.h"
+#include "tests/TestCubeTexture.h"
 
 
 
@@ -80,6 +81,7 @@ int main(void)
         testMenu->RegisterTest<test::TestClearColor>("Clear color");
         testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
         testMenu->RegisterTest<test::TestCube>("Test Cube");
+        testMenu->RegisterTest<test::TestCubeTexture>("Test Cube Textured");
 
         GLfloat deltaTime = 0.0f;
         GLfloat lastFrame = 0.0f;
@@ -88,7 +90,7 @@ int main(void)
         {
             GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
             renderer.Clear();
-            GLfloat currentFrame = (float)glfwGetTime() * 1000;
+            GLfloat currentFrame = (float)glfwGetTime();
             deltaTime = (currentFrame - lastFrame);
             lastFrame = currentFrame;   
 

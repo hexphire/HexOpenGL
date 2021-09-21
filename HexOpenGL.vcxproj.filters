@@ -66,6 +66,9 @@
     <ClCompile Include="src\tests\TestCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\tests\TestCubeTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
@@ -487,6 +490,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="res\shaders\Cube.shader" />
+    <None Include="res\shaders\TextureCube.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -1402,6 +1406,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\tests\TestCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tests\TestCubeTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
