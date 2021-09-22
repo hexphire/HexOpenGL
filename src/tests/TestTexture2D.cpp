@@ -46,7 +46,7 @@ namespace test {
         m_Shader = std::make_unique<Shader>("res/shaders/Basic.shader");
         m_Shader->Bind();
 
-        m_Texture = std::make_unique<Texture>("res/textures/wBWgt51.png");
+        m_Texture = std::make_unique<Texture>("res/textures/cubeTex.png");
         m_Shader->SetUniform1i("u_Texture", 0);
 
         //   print out shader info. 

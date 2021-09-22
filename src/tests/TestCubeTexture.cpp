@@ -14,31 +14,32 @@ namespace test {
     TestCubeTexture::TestCubeTexture()
         : m_Proj(glm::perspective(45.0f, 1.0f * 800 / 600, 0.1f, 10.0f)),
         m_View(glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0))),
-        m_TranslationA(200, 200, 0), m_TranslationB(400, 200, 0), m_xRot(false), m_yRot(false), m_zRot(false)
+        m_TranslationA(200, 200, 0), m_TranslationB(400, 200, 0), m_xRot(false), m_yRot(false), m_zRot(false),
+        fly(false)
         
 	{
 
 		//triangle position verticies
         GLfloat positions[] = {
-            // front
+        // front
         -1.0, -1.0,  1.0,
-        1.0, -1.0,  1.0,
-        1.0,  1.0,  1.0,
+         1.0, -1.0,  1.0,
+         1.0,  1.0,  1.0,
         -1.0,  1.0,  1.0,
         // top
         -1.0,  1.0,  1.0,
-        1.0,  1.0,  1.0,
-        1.0,  1.0, -1.0,
+         1.0,  1.0,  1.0,
+         1.0,  1.0, -1.0,
         -1.0,  1.0, -1.0,
         // back
-        1.0, -1.0, -1.0,
+         1.0, -1.0, -1.0,
         -1.0, -1.0, -1.0,
         -1.0,  1.0, -1.0,
-        1.0,  1.0, -1.0,
+         1.0,  1.0, -1.0,
         // bottom
         -1.0, -1.0, -1.0,
-        1.0, -1.0, -1.0,
-        1.0, -1.0,  1.0,
+         1.0, -1.0, -1.0,
+         1.0, -1.0,  1.0,
         -1.0, -1.0,  1.0,
         // left
         -1.0, -1.0, -1.0,
@@ -46,10 +47,10 @@ namespace test {
         -1.0,  1.0,  1.0,
         -1.0,  1.0, -1.0,
         // right
-        1.0, -1.0,  1.0,
-        1.0, -1.0, -1.0,
-        1.0,  1.0, -1.0,
-        1.0,  1.0,  1.0,
+         1.0, -1.0,  1.0,
+         1.0, -1.0, -1.0,
+         1.0,  1.0, -1.0,
+         1.0,  1.0,  1.0,
     };
 
         GLfloat cube_texcoords[2 * 4 * 6] = {
@@ -65,10 +66,10 @@ namespace test {
 
 
         unsigned int indices[] = {
-            // front
-             0,  1,  2,
-             2,  3,  0,
-             // top
+              // front
+              0,  1,  2,
+              2,  3,  0,
+              // top
               4,  5,  6,
               6,  7,  4,
               // back
@@ -89,7 +90,7 @@ namespace test {
         m_VAO = std::make_unique<VertexArray>();
         m_VertexBuffer = std::make_unique<VertexBuffer>(positions, sizeof(positions));
         m_TexBuffer = std::make_unique<VertexBuffer>(cube_texcoords, sizeof(cube_texcoords));
-        m_Texture = std::make_unique<Texture>("res/textures/wBWgt51.png");
+        m_Texture = std::make_unique<Texture>("res/textures/cubeTex.png");
         VertexBufferLayout layout;
         layout.Push<float>(3);
         layout.Push<float>(3);
@@ -124,6 +125,7 @@ namespace test {
 
 	void TestCubeTexture::OnUpdate(float deltaTime)
 	{
+        glm::mat4 mvp;
         m_angle += 0.5f;
         if (m_angle >= 360) m_angle = 0;
 
@@ -132,8 +134,17 @@ namespace test {
 
         if(m_xRot || m_yRot || m_zRot)
             model = glm::rotate(model, glm::radians(m_angle), axis_y);
+        if (fly) {
+             model =
+                glm::rotate(model, m_angle / 144 * 3.0f, glm::vec3(1, 0, 0)) *  // X axis
+                glm::rotate(model, m_angle / 144 * 2.0f, glm::vec3(0, 1, 0)) *  // Y axis
+                glm::rotate(model, m_angle / 144 * 4.0f, glm::vec3(0, 0, 1));
 
-        glm::mat4 mvp = m_Proj * m_View * model;
+             mvp = m_Proj * m_View * model;
+        }
+        else {
+            mvp = m_Proj * m_View * model;
+        }
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_MVP", mvp);
 
@@ -141,7 +152,7 @@ namespace test {
 
 	void TestCubeTexture::OnRender()
 	{
-		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+		GLCall(glClearColor(1.0f, 1.0f, 1.0f, 1.0f));
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
@@ -194,6 +205,7 @@ namespace test {
         ImGui::Checkbox("x-axis rotation", &m_xRot);
         ImGui::Checkbox("y-axis rotation", &m_yRot);
         ImGui::Checkbox("z-axis rotation", &m_zRot);
+        ImGui::Checkbox("flying", &fly);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 }

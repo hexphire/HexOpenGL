@@ -34,7 +34,7 @@ namespace test {
 		GLint m_uniform_mvp, m_uniform_cubetexture;
 		float m_angle;
 
-		bool m_xRot, m_yRot, m_zRot;
+		bool m_xRot, m_yRot, m_zRot, fly;
 		
 
 		glm::mat4 m_Proj, m_View;
